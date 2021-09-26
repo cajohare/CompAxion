@@ -26,6 +26,8 @@ ADMX_col = '#e02222'
 MADMAX_col = '#d66c02'
 IAXO_col = '#690c91'
 DMRadio_col = '#118c78'
+HB_col = '#27b067'
+
 
 thiscmap = c.LinearSegmentedColormap.from_list('name', cm.Blues(linspace(0.0,0.9)))
 

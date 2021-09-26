@@ -15,9 +15,10 @@ import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.cm as cm
 from scipy.stats import norm
+import PlotFuncs
 
-K_QCD = 6.743e-5 # GeV^4
-
+#K_QCD = 6.743e-5 # GeV^4
+K_QCD = 1.69e-5
 def m2m1_ratio_hierarchical(f,N0,N1,N2):
     eps = 1e-6
     m1 = 1e9*sqrt(K_QCD/f**2*((N0+N1*eps**2)+(4*N2**2*eps**2 + (N0-N1*eps**2)**2)**0.5))
@@ -180,12 +181,13 @@ def Superradiance(file,fvals,epsvals,k=0.04,AnomalyCoefficients=[3,0.5,13/2,3/2]
     return constrained
 
 
-def StellarCooling(ax,fvals,text_pos=[5e6,1e-7],facecolor=[0.0, 0.66, 0.42],edgecolor='k',text_col='w',fs=30,rotation=90):
-    fp_HB = 1/(1/3.4e7-1/fvals)
-    fp_HB[fp_HB<0] = 1e25
-    eps_HB = fvals/fp_HB
-    ax.fill_between(fvals,eps_HB,y2=1e0,color=facecolor,zorder=0)
-    ax.plot(fvals,eps_HB,lw=3,color=edgecolor,zorder=0)
+def StellarCooling(ax,fvals,epsvals,text_pos=[5e6,1e-7],facecolor=PlotFuncs.HB_col,edgecolor='k',text_col='w',fs=30,rotation=90,k=0.04,AnomalyCoefficients=[3,0.5,13/2,3/2],\
+    edge_on=True,linestyle='-'):
+    f,eps = meshgrid(fvals,epsvals)
+    m1,m2,g1,g2 = Couplings(fvals,eps,k,AnomalyCoefficients)
+    g_active = sqrt(g1**2+g2**2)
+    HB = (g_active>6.6e-11)
+    PlotFuncs.PlotContour(ax,fvals,epsvals,HB,zorder=0,alpha=1.0,lw=5,facecolor=facecolor,edgecolor=edgecolor,linestyle=linestyle,edge_on=edge_on)
     ax.text(text_pos[0],text_pos[1],r'{\bf Stellar cooling}',rotation=rotation,fontsize=fs)
     return
 
