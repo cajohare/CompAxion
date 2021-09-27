@@ -6,20 +6,20 @@ Python notebooks to reproduce the plots from the paper arXiv:[2109.XXXX]
 ---
 [<img align="right" src="plots/plots_png/Couplings.png" height="350">](https://github.com/cajohare/NeutrinoFog/raw/master/plots/plots_png/Couplings.png)
 
-# Python files
-* [`AxionFuncs.py`](https://github.com/cajohare/NeutrinoFog/blob/main/src/AxionFuncs.py) 
-* [`PlotFuncs.py`](https://github.com/cajohare/NeutrinoFog/blob/main/src/PlotFuncs.py) 
-
 # Notebooks
 * [`Couplings.ipynb`](https://github.com/cajohare/NeutrinoFog/blob/main/notebooks/Couplings.ipynb) - Figure 1
 * [`AxionMasses.ipynb`](https://github.com/cajohare/NeutrinoFog/blob/main/notebooks/AxionMasses.ipynb) - Figure 2a
 * [`Constraints.ipynb`](https://github.com/cajohare/NeutrinoFog/blob/main/notebooks/Constraints.ipynb) - Figure 2b
 * [`Projections.ipynb`](https://github.com/cajohare/NeutrinoFog/blob/main/notebooks/Projections.ipynb) - Figure 3
 
+# Python files
+* [`AxionFuncs.py`](https://github.com/cajohare/NeutrinoFog/blob/main/src/AxionFuncs.py)
+* [`PlotFuncs.py`](https://github.com/cajohare/NeutrinoFog/blob/main/src/PlotFuncs.py)
+
 # Other content
-* [`limit_data/`](https://github.com/cajohare/NeutrinoFog/tree/main/src) - Contains python and fortran code to produce the main results
+* [`limit_data/`](https://github.com/cajohare/NeutrinoFog/tree/main/src) - Contains digitised limits on the axion-photon coupling
 * [`plots/`](https://github.com/cajohare/NeutrinoFog/tree/main/plots) - Contains all the plots in pdf and png formats
-* [`data/`](https://github.com/cajohare/NeutrinoFog/tree/main/data) - currently just has the Primakoff solar axion flux
+* [`data/`](https://github.com/cajohare/NeutrinoFog/tree/main/data) - currently just has the Primakoff solar axion flux needed for one calculation
 
 ---
 
@@ -27,7 +27,7 @@ If you need any further assistance or have any questions, contact me at ciaran.a
 ```
 @article{Chen:2021xxx,
     author = "Chen, Zhe and Kobakhidze, A. and O'Hare, C. A. J. and Picker, Z. S. C. and Pierobon, G.",
-    title = "{The companion axion model: photon couplings and constraints}",
+    title = "{Phenomenology of the companion axion model: photon couplings}",
     eprint = "2109.XXXX",
     archivePrefix = "arXiv",
     primaryClass = "hep-ph",
