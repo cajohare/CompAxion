@@ -18,7 +18,7 @@ from scipy.stats import norm
 import PlotFuncs
 
 #K_QCD = 6.743e-5 # GeV^4
-K_QCD = 1.69e-5
+K_QCD = 1.62e-5
 def m2m1_ratio_hierarchical(f,N0,N1,N2):
     eps = 1e-6
     m1 = 1e9*sqrt(K_QCD/f**2*((N0+N1*eps**2)+(4*N2**2*eps**2 + (N0-N1*eps**2)**2)**0.5))
