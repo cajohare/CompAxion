@@ -25,9 +25,9 @@ Python notebooks to reproduce the plots from the paper arXiv:[2109.12920]
 
 If you need any further assistance or have any questions, contact me at ciaran.aj.ohare@gmail.com. And if you do use anything here please cite the paper, [Chen et al. 2021](https://arxiv.org/abs/2109.12920)
 ```
-@article{Chen:2021abc,
-    author = "Chen, Zhe and Kobakhidze, A. and O'Hare, C. A. J. and Picker, Z. S. C. and Pierobon, G.",
-    title = "{Phenomenology of the companion axion model: photon couplings}",
+@article{Chen:2021hfq,
+    author = "Chen, Zhe and Kobakhidze, Archil and O'Hare, Ciaran A. J. and Picker, Zachary S. C. and Pierobon, Giovanni",
+    title = "{Phenomenology of the companion-axion model: photon couplings}",
     eprint = "2109.12920",
     archivePrefix = "arXiv",
     primaryClass = "hep-ph",
