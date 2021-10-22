@@ -115,19 +115,21 @@ def MapLimit(file,Prob,m,g):
     return constrained
 
 
-def MapHaloscope_m1(file,fvals,epsvals,k=0.04,AnomalyCoefficients=[3,0.5,13/2,3/2]):
+def MapHaloscope_m1(file,fvals,epsvals,k=0.04,AnomalyCoefficients=[3,0.5,13/2,3/2],Omega_a1=None):
     f,eps = meshgrid(fvals,epsvals)
     dm_sq,m1,m2,tan_2alpha = Parameters(f,eps,k,AnomalyCoefficients)
-    m1,m2,g1,g2 = Couplings(fvals,eps,k,AnomalyCoefficients)
-    Omega_a1 = 1/(1+k**0.41*eps**(-7/6))
+    m1,m2,g1,g2 = Couplings(f,eps,k,AnomalyCoefficients)
+    if Omega_a1 is None:
+        Omega_a1 = 1/(1+k**0.41*eps**(-7/6))
     lim_m1 = MapLimit(file,sqrt(Omega_a1),m1,g1)
     return lim_m1
 
-def MapHaloscope_m2(file,fvals,epsvals,k=0.04,AnomalyCoefficients=[3,0.5,13/2,3/2]):
+def MapHaloscope_m2(file,fvals,epsvals,k=0.04,AnomalyCoefficients=[3,0.5,13/2,3/2],Omega_a2=None):
     f,eps = meshgrid(fvals,epsvals)
     dm_sq,m1,m2,tan_2alpha = Parameters(f,eps,k,AnomalyCoefficients)
-    m1,m2,g1,g2 = Couplings(fvals,eps,k,AnomalyCoefficients)
-    Omega_a2 = 1/(1+k**-0.41*eps**(7/6))
+    m1,m2,g1,g2 = Couplings(f,eps,k,AnomalyCoefficients)
+    if Omega_a2 is None:
+        Omega_a2 = 1/(1+k**-0.41*eps**(7/6))
     lim_m2 = MapLimit(file,sqrt(Omega_a2),m2,g2)
     return lim_m2
 
@@ -135,7 +137,7 @@ def MapHaloscope_m2(file,fvals,epsvals,k=0.04,AnomalyCoefficients=[3,0.5,13/2,3/
 def MapHelioscope_m1(file,fvals,epsvals,n=100,k=0.04,AnomalyCoefficients=[3,0.5,13/2,3/2]):
     f,eps = meshgrid(fvals,epsvals)
     dm_sq,m1,m2,tan_2alpha = Parameters(f,eps,k,AnomalyCoefficients)
-    m1,m2,g1,g2 = Couplings(fvals,eps,k,AnomalyCoefficients)
+    m1,m2,g1,g2 = Couplings(f,eps,k,AnomalyCoefficients)
 
     Mix2 = Mixing2(f,eps,k,AnomalyCoefficients)
     Mix1 = Mixing1(f,eps,k,AnomalyCoefficients)
@@ -149,7 +151,7 @@ def MapHelioscope_m1(file,fvals,epsvals,n=100,k=0.04,AnomalyCoefficients=[3,0.5,
 def MapHelioscope_m2(file,fvals,epsvals,n=100,k=0.04,AnomalyCoefficients=[3,0.5,13/2,3/2]):
     f,eps = meshgrid(fvals,epsvals)
     dm_sq,m1,m2,tan_2alpha = Parameters(f,eps,k,AnomalyCoefficients)
-    m1,m2,g1,g2 = Couplings(fvals,eps,k,AnomalyCoefficients)
+    m1,m2,g1,g2 = Couplings(f,eps,k,AnomalyCoefficients)
 
     Mix2 = Mixing2(f,eps,k,AnomalyCoefficients)
     Mix1 = Mixing1(f,eps,k,AnomalyCoefficients)
@@ -190,6 +192,232 @@ def StellarCooling(ax,fvals,epsvals,text_pos=[5e6,1e-7],facecolor=PlotFuncs.HB_c
     PlotFuncs.PlotContour(ax,fvals,epsvals,HB,zorder=0,alpha=1.0,lw=5,facecolor=facecolor,edgecolor=edgecolor,linestyle=linestyle,edge_on=edge_on)
     ax.text(text_pos[0],text_pos[1],r'{\bf Stellar cooling}',rotation=rotation,fontsize=fs)
     return
+
+
+
+def Omega_gw(fvals,m,k,A=0.8,eg=0.7,Omega_rad=4.15e-5):
+
+    M2 = 2.4e18*1e9
+    M = 1.22e19*1e9
+    A = 0.8
+
+    g = 10
+    g0 = 3.36
+    gs0 = 3.1
+    gann = 10
+    gsann = 10
+
+    sigma = K_QCD*(1e9**4)/m # eV
+
+    Tann = sqrt(m/(1+1/k))*sqrt(M2/(2*pi))*(90/g)**(1/4) # eV
+
+    Oann = eg*A**2*sigma**2/(Tann**4*M**2)
+
+    fpeak = 1.1e-9*(Tann/1e7)
+    Opeak = Omega_rad*(gann/g0)*(gs0/gsann)**(4/3)*Oann
+
+    Omega1 = Opeak*(fvals/fpeak)**3
+    Omega2 = Opeak*(fvals/fpeak)**-1
+    Omega = Omega1*(fvals<fpeak) + Omega2*(fvals>=fpeak)
+    return Omega
+
+
+def Omega_gw_peak(m,k,A=0.8,eg=0.7,Omega_rad=4.15e-5):
+
+    M2 = 2.4e18*1e9
+    M = 1.22e19*1e9
+    A = 0.8
+
+    g = 10
+    g0 = 3.36
+    gs0 = 3.1
+    gann = 10
+    gsann = 10
+
+    sigma = K_QCD*(1e9**4)/m # eV
+
+    Tann = sqrt(m/(1+1/k))*sqrt(M2/(2*pi))*(90/g)**(1/4) # eV
+
+    Oann = eg*A**2*sigma**2/(Tann**4*M**2)
+
+    fpeak = 1.1e-9*(Tann/1e7)
+    Opeak = Omega_rad*(gann/g0)*(gs0/gsann)**(4/3)*Oann
+    return fpeak,Opeak
+
+def MapLimit_GW(file,fvals,epsvals,k=0.6,AnomalyCoefficients=[3,0.5,13/2,3/2],A=0.8,eg=0.7,Omega_rad=4.15e-5):
+    f,eps = meshgrid(fvals,epsvals)
+
+    dm_sq,m1,m2,tan_2alpha = Parameters(f,eps,k=k,AnomalyCoefficients=AnomalyCoefficients)
+
+    dat = 10.0**loadtxt('limit_data/GravitationalWaves/power-law-integrated_sensitivities/plis_'+file+'.dat')[:,0:2]
+    f_lim = dat[:,0]
+    O_lim = dat[:,1]
+
+    ni = shape(m2)[0]
+    nj = shape(m2)[1]
+    constrained = zeros_like(m2)
+    for i in range(0,ni):
+        for j in range(0,nj):
+            Omega = Omega_gw(f_lim,m2[i,j],k,A=A,eg=eg,Omega_rad=Omega_rad)+Omega_gw(f_lim,m1[i,j],k,A=A,eg=eg,Omega_rad=Omega_rad)
+            constrained[i,j] = sum(Omega>O_lim)
+    constrained = constrained>0
+    return constrained
+
+def MapLimit_NanoGRAV(fvals,epsvals,k=0.6,AnomalyCoefficients=[3,0.5,13/2,3/2],A=0.8,eg=0.7,Omega_rad=4.15e-5):
+    f,eps = meshgrid(fvals,epsvals)
+
+    dm_sq,m1,m2,tan_2alpha = Parameters(f,eps,k=k,AnomalyCoefficients=AnomalyCoefficients)
+
+    dat = loadtxt('limit_data/GravitationalWaves/NANOGrav_hint.txt')
+    f_lim1 = dat[5:10,0] # upper limit
+    O_lim1 = dat[5:10,1]
+    f_lim2 = dat[10:15,0] # lower limit
+    O_lim2 = dat[10:15,1]
+    ni = shape(m2)[0]
+    nj = shape(m2)[1]
+    constrained = zeros_like(m2)
+    for i in range(0,ni):
+        for j in range(0,nj):
+            Omega1 = Omega_gw(f_lim1,m2[i,j],k,A=A,eg=eg,Omega_rad=Omega_rad)+Omega_gw(f_lim1,m1[i,j],k,A=A,eg=eg,Omega_rad=Omega_rad)
+            Omega2 = Omega_gw(f_lim2,m2[i,j],k,A=A,eg=eg,Omega_rad=Omega_rad)+Omega_gw(f_lim2,m1[i,j],k,A=A,eg=eg,Omega_rad=Omega_rad)
+            constrained[i,j] = sum(Omega1<O_lim1)*sum(Omega2>O_lim2)
+    constrained = constrained>0
+    return constrained
+
+
+# Cosmology
+
+Mpl_GeV = 2.4e18
+Mpl_MeV = Mpl_GeV*1e3
+T0 = 2.35e-4/1e6 # MeV
+g0 = 3.91
+g1 = 61.75
+ni = 6.68
+Tt = 103.0 # MeV
+rho_c = 8.06e-11 # eV^4
+
+def Omega_CaseI(f,eps,k,theta_1,theta_2):
+    dm_sq,m1,m2,tan_2alpha = Parameters(f,eps)
+
+    T1 = ((m1/1e6)*Mpl_MeV*sqrt(90)/(3*pi*sqrt(g1)))**(2/(ni+4))*Tt**(ni/(ni+4))
+
+    m1_T1 = m1*(Tt/T1)**(ni/2) # eV
+
+    rho1 = m1_T1*m1*theta_1**2*(f*1e9)**2*(T0/T1)**3*(g0/g1) # eV
+    ke = k**((ni+2)/(2*(ni+4)))*eps**(-(ni+6)/(ni+4))
+
+    Omega1 = rho1/rho_c
+    Omega2 = Omega1*(theta_2/theta_1)**2*ke
+    return Omega1,Omega2
+
+def Thetas_CaseI(f,eps,k,Omega_dm=0.12):
+    dm_sq,m1,m2,tan_2alpha = Parameters(f,eps)
+
+    T1 = ((m1/1e6)*Mpl_MeV*sqrt(90)/(3*pi*sqrt(g1)))**(2/(ni+4))*Tt**(ni/(ni+4))
+
+    m1_T1 = m1*(Tt/T1)**(ni/2) # eV
+
+    F = (m1_T1*m1*(f*1e9)**2*(T0/T1)**3*(g0/g1))
+    ke = k**((ni+2)/(2*(ni+4)))*eps**(-(ni+6)/(ni+4))
+
+    theta_1_max = sqrt(Omega_dm*rho_c/F)
+    theta_2_max = sqrt(Omega_dm*rho_c/(F*ke))
+    return theta_1_max,theta_2_max
+
+def Omega_CaseII(f,eps,k,Omega_dm=0.12):
+    theta_1 = pi/sqrt(3)
+
+    dm_sq,m1,m2,tan_2alpha = Parameters(f,eps)
+
+    T1 = ((m1/1e6)*Mpl_MeV*sqrt(90)/(3*pi*sqrt(61.75)))**(2/(ni+4))*Tt**(ni/(ni+4))
+
+    rho_c = 8.06e-11 # eV^4
+
+    m1_T1 = m1*(Tt/T1)**(ni/2) # eV
+
+    rho1 = m1_T1*m1*theta_1**2*(f*1e9)**2*(T0/T1)**3*(g0/g1) # eV
+
+    ke = k**((ni+2)/(2*(ni+4)))*eps**(-(ni+6)/(ni+4))
+
+    Omega1 = rho1/rho_c
+    theta_2 = theta_1*sqrt((Omega_dm/Omega1 - 1)/ke)
+    Omega2 = Omega_dm-Omega1
+    return Omega1,Omega2,theta_2
+
+
+def Omega_CaseIII(f,eps,k):
+    theta_1 = pi/sqrt(3)
+    theta_2 = pi/sqrt(3)
+
+    dm_sq,m1,m2,tan_2alpha = Parameters(f,eps)
+
+    T1 = ((m1/1e6)*Mpl_MeV*sqrt(90)/(3*pi*sqrt(61.75)))**(2/(ni+4))*Tt**(ni/(ni+4))
+
+    m1_T1 = m1*(Tt/T1)**(ni/2) # eV
+
+    rho1 = m1_T1*m1*theta_1**2*(f*1e9)**2*(T0/T1)**3*(g0/g1) # eV
+
+    Omega1 = rho1/rho_c
+    Omega2 = Omega1*(theta_2/theta_1)**2*k**((ni+2)/(2*(ni+4)))*eps**(-(ni+6)/(ni+4))
+
+    return Omega1,Omega2
+
+
+def Omega_CaseIII(f,eps,k):
+    Mpl_GeV = 2.4e18
+    Mpl_MeV = Mpl_GeV*1e3
+    T0 = 2.35e-4/1e6 # MeV
+    g0 = 3.91
+    g1 = 61.75
+    ni = 6.68
+    Tt = 103.0 # MeV
+
+    theta_1 = pi/sqrt(3)
+    theta_2 = pi/sqrt(3)
+
+    dm_sq,m1,m2,tan_2alpha = Parameters(f,eps)
+
+    T1 = ((m1/1e6)*Mpl_MeV*sqrt(90)/(3*pi*sqrt(61.75)))**(2/(ni+4))*Tt**(ni/(ni+4))
+
+    rho_c = 8.06e-11 # eV^4
+
+    m1_T1 = m1*(Tt/T1)**(ni/2) # eV
+
+    rho1 = m1_T1*m1*theta_1**2*(f*1e9)**2*(T0/T1)**3*(g0/g1) # eV
+
+    Omega1 = rho1/rho_c
+    Omega2 = Omega1*(theta_2/theta_1)**2*k**((ni+2)/(2*(ni+4)))*eps**(-(ni+6)/(ni+4))
+
+    return Omega1,Omega2
+
+
+def Theta2_CaseII(f,eps,k,Omega_dm=0.12):
+    Mpl_GeV = 2.4e18
+    Mpl_MeV = Mpl_GeV*1e3
+    T0 = 2.35e-4/1e6 # MeV
+    g0 = 3.91
+    g1 = 61.75
+    ni = 6.68
+    Tt = 103.0 # MeV
+
+    theta_1 = pi/sqrt(3)
+
+    dm_sq,m1,m2,tan_2alpha = Parameters(f,eps)
+
+    T1 = ((m1/1e6)*Mpl_MeV*sqrt(90)/(3*pi*sqrt(61.75)))**(2/(ni+4))*Tt**(ni/(ni+4))
+
+    rho_c = 8.06e-11 # eV^4
+
+    m1_T1 = m1*(Tt/T1)**(ni/2) # eV
+
+    rho1 = m1_T1*m1*theta_1**2*(f*1e9)**2*(T0/T1)**3*(g0/g1) # eV
+
+    ke = k**((ni+2)/(2*(ni+4)))*eps**(-(ni+6)/(ni+4))
+
+    Omega1 = rho1/rho_c
+    theta_2 = theta_1*sqrt((Omega_dm/Omega1 - 1)/ke)
+    Omega2 = Omega_dm-Omega1
+    return theta_2,Omega1,Omega2
 
 # def Superradiance(ax,fvals,epsvals,k=0.04,AnomalyCoefficients=[3,0.5,13/2,3/2],text_shift=[1,1],fs=25,\
 #                             whichfile='Mehta',facecolor='gray',edgecolor='k',text_col='k',text_rot=51):

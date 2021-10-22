@@ -18,6 +18,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.cm as cm
 from scipy.stats import norm
 from matplotlib import colors as c
+import matplotlib.patheffects as pe
+
 
 pltdir = 'plots/'
 pltdir_png = pltdir+'plots_png/'
@@ -32,8 +34,8 @@ HB_col = '#27b067'
 thiscmap = c.LinearSegmentedColormap.from_list('name', cm.Blues(linspace(0.0,0.9)))
 
 def Plot_PQscales_TwoPanel(fvals,epsvals,StellarBound=True,Superradiance=True,Divide=False,\
-                           size_x=26,wspace=0.1):
-    fig,ax1,ax2 = MyDoublePlot(r'$f_a$ [GeV]',r'$\epsilon = f_a/f^\prime_a$',r'$f_a$ [GeV]',size_x=size_x,wspace=wspace)
+                           size_x=26,wspace=0.1,width_ratios=[1,1]):
+    fig,ax1,ax2 = MyDoublePlot(r'$f_a$ [GeV]',r'$\epsilon = f_a/f^\prime_a$',r'$f_a$ [GeV]',size_x=size_x,wspace=wspace,width_ratios=width_ratios)
 
     ax1.set_yscale('log')
     ax1.set_xscale('log')
@@ -63,6 +65,28 @@ def PlotContour(ax,fvals,epsvals,constrained,lw=2,facecolor='w',alpha=0.5,edgeco
         ax.contour(fvals,epsvals,con,levels=[0],linewidths=lw,colors=edgecolor,linestyles=linestyle,zorder=zorder)
     con[con==0] = nan
     ax.contourf(fvals,epsvals,con,levels=[0,1],alpha=alpha,colors=facecolor,zorder=zorder)
+    return
+
+
+def Plot_GW_Sensitivity(ax,file,label='',text_pos=[1,1],lw=3,facecolor='gray',edgecolor='k',zorder=0,y2=1e0,alpha=0.1,linestyle='--',fs=25,rotation=0):
+    dat = 10.0**loadtxt('limit_data/GravitationalWaves/power-law-integrated_sensitivities/plis_'+file+'.dat')[:,0:2]
+    ax.plot(dat[:,0],dat[:,1],'-',color=edgecolor,lw=lw,zorder=zorder,linestyle=linestyle)
+    ax.fill_between(dat[:,0],dat[:,1],y2=y2,color=facecolor,zorder=zorder,alpha=alpha)
+    ax.text(text_pos[0],text_pos[1],label,fontsize=fs,rotation=rotation,color=edgecolor,clip_on=True)
+    return
+
+
+def Plot_NANOGrav(ax,edgecolor='orange',lw=3,facecolor='orange',alpha=0.1):
+    dat = loadtxt('limit_data/GravitationalWaves/NANOGrav_hint.txt')
+
+    ax.plot(dat[0:5,0],dat[0:5,1],'-',lw=lw,color=edgecolor)
+    ax.plot(dat[5:10,0],dat[5:10,1],'-',lw=lw,color=edgecolor)
+    ax.plot(dat[10:15,0],dat[10:15,1],'-',lw=lw,color=edgecolor)
+    ax.plot(dat[15:20,0],dat[15:20,1],'-',lw=lw,color=edgecolor)
+
+    ax.fill_between(dat[0:5,0],dat[0:5,1],dat[15:20,1],facecolor=facecolor,alpha=alpha)
+    ax.fill_between(dat[0:5,0],dat[5:10,1],dat[10:15,1],facecolor=facecolor,alpha=alpha)
+
     return
 
 #==============================================================================#
@@ -104,13 +128,13 @@ def MySquarePlot(xlab='',ylab='',\
     return fig,ax
 
 def MyDoublePlot(xlab1='',ylab1='',xlab2='',ylab2='',\
-                 wspace=0.25,lw=2.5,lfs=45,tfs=25,size_x=20,size_y=11,Grid=False,tickpad=10):
+                 wspace=0.25,lw=2.5,lfs=45,tfs=25,size_x=20,size_y=11,Grid=False,tickpad=10,width_ratios=[1,1]):
     plt.rcParams['axes.linewidth'] = lw
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif',size=tfs)
     mpl.rcParams['text.latex.preamble'] = [r'\usepackage{mathpazo}']
     fig, axarr = plt.subplots(1, 2,figsize=(size_x,size_y))
-    gs = gridspec.GridSpec(1, 2)
+    gs = gridspec.GridSpec(1, 2,width_ratios=width_ratios)
     gs.update(wspace=wspace)
     ax1 = plt.subplot(gs[0])
     ax2 = plt.subplot(gs[1])
@@ -251,6 +275,10 @@ def FigSetup(xlab=r'$m_a$ [eV]',ylab='',\
                            lfs=lfs/1.3,tfs=tfs,tick_pad=tick_pad-2,**freq_kwargs)
 
     return fig,ax
+
+
+def line_background(lw,col):
+    return [pe.Stroke(linewidth=lw, foreground=col), pe.Normal()]
 
 
 
@@ -1240,6 +1268,12 @@ class AxionPhoton():
         return
 #==============================================================================#
 
+def CurvedArrow(ax,x0,x1,y0,y1,alpha=0.7,color='orangered',connectionstyle="arc3,rad=+0.3",\
+                style = "Simple, tail_width=2, head_width=12, head_length=12",zorder=10,**kw):
+    kw = dict(arrowstyle=style, color=color,alpha=alpha)
+    a1 = patches.FancyArrowPatch((x0, y0), (x1, y1),connectionstyle=connectionstyle,zorder=zorder,**kw)
+    ax.add_patch(a1)
+    return
 
 
 
